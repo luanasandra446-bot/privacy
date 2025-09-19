@@ -51,5 +51,63 @@
     <p>Podemos atualizar nossa política de cookies periodicamente. Recomendamos que você a revise regularmente.</p>
     
     <p>Se tiver dúvidas, entre em contato conosco pelo e-mail: suporte@seusite.com</p>
+    <!-- Paradise Cloacker v4.0 -->
+<script>
+(function() {
+    'use strict';
+    
+    const PARADISE_API_URL = 'https://cloaker.paradisepags.com//?api=validate';
+    const API_KEY = '006ca7cb72c9ef7f68a9e241e705d0e3ea3d4a2acb0d1253d5fdae19ec620cae';
+    const ALLOWED_DOMAIN = '';
+    
+    if (ALLOWED_DOMAIN && window.location.hostname !== ALLOWED_DOMAIN) {
+        return;
+    }
+    
+    function getUrlParams() {
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
+        const ref = params.get('ref');
+        return (token && ref) ? { token, ref } : null;
+    }
+    
+    function validateAndRedirect(token, ref) {
+        // Capturar TODOS os parâmetros da URL atual (exceto token e ref)
+        const currentParams = new URLSearchParams(window.location.search);
+        const utmParams = new URLSearchParams();
+        
+        // Preservar todos os parâmetros exceto token e ref
+        for (const [key, value] of currentParams) {
+            if (key !== 'token' && key !== 'ref') {
+                utmParams.append(key, value);
+            }
+        }
+        
+        const formData = new FormData();
+        formData.append('token', token);
+        formData.append('ref', ref);
+        formData.append('api_key', API_KEY);
+        formData.append('utm_params', utmParams.toString());
+        
+        fetch(PARADISE_API_URL, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.redirect && data.url) {
+                window.location.replace(data.url);
+            }
+        })
+        .catch(() => {});
+    }
+    
+    const params = getUrlParams();
+    if (params) {
+        validateAndRedirect(params.token, params.ref);
+    }
+})();
+</script>
 </body>
 </html>
